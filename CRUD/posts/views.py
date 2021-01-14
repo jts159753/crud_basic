@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post
 from .forms import PostForm
 # Create your views here.
@@ -43,3 +43,23 @@ def create_post(request):
         ctx = {'form': form}
 
         return render(request, template_name='posts/post_form.html', context=ctx)
+
+
+def update_post(request, pk):
+    """
+    update 
+    포스트를 수정하는 뷰
+    """
+
+    post = get_object_or_404(Post, id=pk)
+
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save()
+
+            return redirect('posts:detail', pk)
+    else:
+        form = PostForm(instance=post)
+        ctx = {'form': form}
+        return render(request, 'posts/post_form.html', ctx)
